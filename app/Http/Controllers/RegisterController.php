@@ -2,11 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use App\Mail\WelcomeUserMail;
+use App\Jobs\SendWelcomeEmailJob;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Mail;
 
 class RegisterController extends Controller
 {
@@ -29,11 +28,9 @@ class RegisterController extends Controller
             'password' => Hash::make($request->password),
         ]);
 
-        Mail::to($user->email)->send(new WelcomeUserMail([
-            'name' => $user->name,
-        ]));
+        SendWelcomeEmailJob::dispatch($user);
 
-        return redirect()->route('register.create')
+        return redirect('/MailerBrevo/register')
             ->with('success', 'Registro exitoso. Revisa tu correo.');
     }
 }
